@@ -1,4 +1,4 @@
 const loginRoute = '/login/';
 const registerRoute = '/register/';
-const verifyEmailRoute = '/verifyEmail/';
+const verifyEmailRoute = '/verify-email/';
 const notesRoute = '/notes/';

@@ -59,17 +59,25 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                        email: email, password: password);
+                final userCredential =
+                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
+                Navigator.of(context).pushNamed(verifyEmailRoute);
                 // ignore: avoid_print
                 print(userCredential);
               } on FirebaseAuthException catch (e) {
                 // ignore: avoid_print
                 showSnackBar(e.toString(), context);
+              } catch (e) {
+                showErrorDialog(
+                  context,
+                  e.toString(),
+                );
               }
-              final user = FirebaseAuth.instance.currentUser;
-              await user?.sendEmailVerification();
             },
             child: const Text(
               "Register",
