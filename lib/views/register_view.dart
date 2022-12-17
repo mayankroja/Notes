@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/constants/routes.dart';
+import 'package:notes/services/auth/auth_exceptions.dart';
+import 'package:notes/services/auth/auth_service.dart';
 import '../utility/utilities.dart';
 
 class RegisterView extends StatefulWidget {
@@ -59,20 +60,15 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential =
-                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
-                final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
+                final userCredential = await AuthService.firebase()
+                    .createUser(email: email, password: password);
+                await AuthService.firebase().sendEmailVerification();
                 Navigator.of(context).pushNamed(verifyEmailRoute);
                 // ignore: avoid_print
                 print(userCredential);
-              } on FirebaseAuthException catch (e) {
-                // ignore: avoid_print
+              } on MyFirebaseAuthException catch (e) {
                 showSnackBar(e.toString(), context);
-              } catch (e) {
+              } on GenericAuthException catch (e) {
                 showErrorDialog(
                   context,
                   e.toString(),
