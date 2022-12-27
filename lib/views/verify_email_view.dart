@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:notes/constants/routes.dart';
-import 'package:notes/services/auth/auth_service.dart';
+import 'package:notes/extensions/buildcontext/loc.dart';
+import 'package:notes/services/auth/bloc/auth_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:notes/services/auth/bloc/auth_event.dart';
 
 class VerifyEmailView extends StatefulWidget {
-  const VerifyEmailView({super.key});
+  const VerifyEmailView({Key? key}) : super(key: key);
 
   @override
-  State<VerifyEmailView> createState() => _VerifyEmailViewState();
+  _VerifyEmailViewState createState() => _VerifyEmailViewState();
 }
 
 class _VerifyEmailViewState extends State<VerifyEmailView> {
@@ -14,33 +16,37 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notes'),
+        title: Text(context.loc.verify_email),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            const Text(
-                "We've sent you an email verification. Please open it to verify your account. "),
-            const Text(
-                "If you haven't received a verification email yet, please press the button below. "),
-            TextButton(
-              onPressed: () async {
-                await AuthService.firebase().sendEmailVerification();
-              },
-              child: const Text(
-                'Send email verification',
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                context.loc.verify_email_view_prompt,
               ),
             ),
             TextButton(
               onPressed: () {
-                AuthService.firebase().logout();
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+                context.read<AuthBloc>().add(
+                      const AuthEventSendEmailVerification(),
+                    );
               },
-              child: const Text(
-                'Go back to Login',
+              child: Text(
+                context.loc.verify_email_send_email_verification,
               ),
             ),
+            TextButton(
+              onPressed: () async {
+                context.read<AuthBloc>().add(
+                      const AuthEventLogOut(),
+                    );
+              },
+              child: Text(
+                context.loc.restart,
+              ),
+            )
           ],
         ),
       ),
